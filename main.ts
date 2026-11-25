@@ -17,11 +17,14 @@ const LINE =
 
 // Gate mirror: the house gate accepts 1-200 characters of non-whitespace
 // text. Fail loudly here rather than write a line the gate would refuse.
+// Count code points, not UTF-16 units, so the mirror matches the gate's
+// character count exactly even for characters outside the BMP.
 // Note: no trailing newline — writeFileSync writes exactly LINE, so the
 // gated file is 99 chars / 101 bytes, matching the char count the gate
 // measures.
-if (LINE.length < 1 || LINE.length > 200 || !LINE.trim()) {
-  throw new Error(`entry line is ${LINE.length} chars, outside the 1-200 gate`);
+const charCount = [...LINE].length;
+if (charCount < 1 || charCount > 200 || !LINE.trim()) {
+  throw new Error(`entry line is ${charCount} chars, outside the 1-200 gate`);
 }
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
